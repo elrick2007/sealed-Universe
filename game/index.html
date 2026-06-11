@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE WEEPING WALLS — Sealed Universe: Game One</title>
+<style>
+  :root{
+    --paper:#e8e0cc; --ink:#2a2632; --blood:#6e1f1f; --amber:#c9982f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:100%;height:100%;background:#000;overflow:hidden;
+    font-family:Georgia,'Times New Roman',serif;}
+  canvas#view{position:absolute;inset:0;width:100%;height:100%;display:block;
+    image-rendering:pixelated;cursor:none;}
+
+  /* ---------- title screen ---------- */
+  #title{position:absolute;inset:0;background:#0a0a0c;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;z-index:50;
+    transition:opacity 2s;}
+  #title.gone{opacity:0;pointer-events:none;}
+  #title h1{font-size:8vmin;letter-spacing:1.2vmin;color:#b8b2a4;font-weight:normal;
+    text-shadow:0 0 18px rgba(110,31,31,.55), 0 2px 0 #000;
+    filter:blur(.4px);}
+  #title h2{margin-top:1.4vmin;font-size:2vmin;letter-spacing:.9vmin;color:#5d5648;}
+  #title .start{margin-top:9vmin;font-size:2.4vmin;color:#8a8374;letter-spacing:.4vmin;
+    border:1px solid #3a352c;padding:1.6vmin 4vmin;cursor:pointer;background:none;
+    font-family:inherit;transition:all .4s;}
+  #title .start:hover{color:#d8d0bc;border-color:#8a8374;background:#15130f;}
+  #title .note{position:absolute;bottom:4vmin;font-size:1.5vmin;color:#444;
+    letter-spacing:.2vmin;text-align:center;line-height:2.4vmin;}
+  #title .wall{position:absolute;inset:0;opacity:.14;pointer-events:none;}
+
+  /* ---------- HUD ---------- */
+  #hud{position:absolute;inset:0;pointer-events:none;z-index:20;}
+  #prompt{position:absolute;left:50%;top:62%;transform:translateX(-50%);
+    background:rgba(10,9,8,.78);border:1px solid #4a4234;color:#cfc6ae;
+    font-size:15px;letter-spacing:1px;padding:7px 16px;opacity:0;
+    transition:opacity .15s;font-style:italic;}
+  #objective{position:absolute;top:26px;left:50%;transform:translateX(-50%);
+    color:#a89c7e;font-size:14px;letter-spacing:2px;font-style:italic;opacity:0;
+    transition:opacity 1.2s;text-shadow:0 1px 2px #000;}
+  #caption{position:absolute;bottom:11%;left:50%;transform:translateX(-50%);
+    width:64%;text-align:center;color:#d6cdb6;font-size:17px;line-height:26px;
+    font-style:italic;text-shadow:0 1px 3px #000,0 0 14px rgba(0,0,0,.9);
+    opacity:0;transition:opacity .4s;}
+  #caption.ev{color:#b9c4cf;}
+  #gadget{position:absolute;right:26px;bottom:22px;color:#7d745f;font-size:12px;
+    letter-spacing:2px;opacity:.85;}
+  #jhint{position:absolute;left:26px;bottom:22px;color:#5d5648;font-size:12px;
+    letter-spacing:2px;}
+  #wave{position:absolute;left:50%;bottom:54px;transform:translateX(-50%);
+    width:300px;height:46px;background:rgba(8,8,8,.72);border:1px solid #3c382e;
+    display:none;}
+  #vignette{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.55) 100%);}
+
+  /* ---------- fade ---------- */
+  #fade{position:absolute;inset:0;background:#000;opacity:1;z-index:40;
+    pointer-events:none;transition:opacity 2.4s;}
+  #fade.show{pointer-events:all;}
+
+  /* ---------- journal ---------- */
+  #journal{position:absolute;inset:0;z-index:30;display:none;
+    background:rgba(4,3,3,.88);}
+  #journal .book{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-.4deg);
+    width:min(860px,92vw);height:min(600px,88vh);background:var(--paper);
+    box-shadow:0 12px 60px #000, inset 0 0 80px rgba(120,100,60,.25);
+    color:var(--ink);display:flex;flex-direction:column;}
+  #journal .tabs{display:flex;border-bottom:1px solid #b3a888;}
+  #journal .tabs div{padding:12px 22px;font-size:14px;letter-spacing:2px;cursor:pointer;
+    color:#7a6f55;}
+  #journal .tabs div.on{color:var(--ink);background:rgba(0,0,0,.05);
+    border-bottom:2px solid var(--blood);}
+  #journal .page{flex:1;overflow-y:auto;padding:26px 40px;
+    background-image:repeating-linear-gradient(transparent 0 27px, rgba(110,90,60,.18) 27px 28px);}
+  .entry{margin-bottom:20px;font-size:16px;line-height:28px;font-style:italic;}
+  .entry .t{font-size:12px;letter-spacing:2px;color:var(--blood);font-style:normal;}
+  .entry.frag{letter-spacing:1px;word-spacing:6px;color:#473f50;}
+  #planCanvas{background:transparent;display:block;margin:8px auto;}
+  .audioRow{display:flex;align-items:center;gap:14px;padding:10px 4px;
+    border-bottom:1px dashed #b3a888;font-size:15px;font-style:italic;}
+  .audioRow .play{cursor:pointer;border:1px solid #7a6f55;border-radius:50%;
+    width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+    font-style:normal;font-size:12px;flex:none;}
+  .audioRow .play:hover{background:rgba(0,0,0,.08);}
+  .audioRow .mark{color:var(--blood);font-size:12px;letter-spacing:1px;font-style:normal;}
+  #journal .close{position:absolute;top:10px;right:16px;font-size:13px;color:#7a6f55;
+    cursor:pointer;letter-spacing:1px;}
+
+  /* ---------- recorder review ---------- */
+  #review{position:absolute;inset:0;z-index:32;display:none;background:rgba(2,2,3,.93);}
+  #review .deck{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(720px,92vw);background:#101012;border:1px solid #2c2c30;
+    box-shadow:0 10px 50px #000;color:#9aa39c;padding:28px 34px;
+    font-family:'Courier New',monospace;}
+  #review h3{font-size:15px;letter-spacing:3px;color:#6f7a70;font-weight:normal;
+    border-bottom:1px solid #26262a;padding-bottom:12px;margin-bottom:6px;}
+  .track{padding:13px 6px;border-bottom:1px solid #1c1c20;cursor:pointer;
+    font-size:14px;letter-spacing:1px;display:flex;justify-content:space-between;}
+  .track:hover{background:#16161a;}
+  .track .st{color:#4a524c;}
+  .track.hot .st{color:var(--amber);}
+  #scrub{display:none;margin-top:18px;}
+  #scrubBar{position:relative;height:34px;background:#0a0a0c;border:1px solid #26262a;
+    cursor:pointer;}
+  #scrubFill{position:absolute;top:0;bottom:0;left:0;width:0;background:rgba(110,130,115,.18);}
+  .marker{position:absolute;top:0;bottom:0;width:3px;background:var(--amber);
+    box-shadow:0 0 8px var(--amber);}
+  #scrubTime{margin-top:8px;font-size:13px;letter-spacing:2px;color:#5a635c;}
+  #reviewWave{width:100%;height:60px;background:#0a0a0c;border:1px solid #26262a;
+    margin-top:14px;display:block;}
+  #review .close{position:absolute;top:12px;right:18px;cursor:pointer;color:#555;
+    letter-spacing:1px;font-size:12px;}
+
+  /* ---------- end card ---------- */
+  #endcard{position:absolute;inset:0;z-index:45;background:#050506;display:none;
+    flex-direction:column;align-items:center;justify-content:center;opacity:0;
+    transition:opacity 3s;}
+  #endcard.show{opacity:1;}
+  #endcard p{color:#8d8678;font-size:2.2vmin;letter-spacing:.5vmin;font-style:italic;
+    margin:1.2vmin;text-align:center;line-height:4vmin;}
+  #endcard .big{font-size:3.4vmin;color:#b8b2a4;letter-spacing:1vmin;font-style:normal;}
+  #endcard .cont{margin-top:7vmin;font-size:1.8vmin;color:#6a6354;cursor:pointer;
+    border:1px solid #33302a;padding:1.2vmin 3vmin;letter-spacing:.3vmin;}
+  #endcard .cont:hover{color:#cfc6ae;}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<div id="hud">
+  <div id="vignette"></div>
+  <div id="objective"></div>
+  <div id="prompt"></div>
+  <div id="caption"></div>
+  <canvas id="wave" width="300" height="46"></canvas>
+  <div id="gadget"></div>
+  <div id="jhint"></div>
+</div>
+
+<div id="journal">
+  <div class="book">
+    <div class="tabs">
+      <div data-tab="notes" class="on">NOTES</div>
+      <div data-tab="audio">AUDIO LOG</div>
+      <div data-tab="plan">FLOOR PLAN</div>
+    </div>
+    <div class="page" id="pageNotes"></div>
+    <div class="page" id="pageAudio" style="display:none"></div>
+    <div class="page" id="pagePlan" style="display:none">
+      <canvas id="planCanvas" width="700" height="460"></canvas>
+    </div>
+    <div class="close">J — close</div>
+  </div>
+</div>
+
+<div id="review">
+  <div class="deck">
+    <h3>OVERNIGHT RECORDINGS — NOV 29</h3>
+    <div id="tracks"></div>
+    <div id="scrub">
+      <div id="scrubBar"><div id="scrubFill"></div></div>
+      <div id="scrubTime">00:00:00</div>
+      <canvas id="reviewWave" width="650" height="60"></canvas>
+    </div>
+    <div class="close">ESC — close</div>
+  </div>
+</div>
+
+<div id="endcard">
+  <p class="big">END OF ACT ONE</p>
+  <p>The voice is on the tape. She is in the walls.<br>
+     The Weeping Walls continues in Act Two: Investigation.</p>
+  <p style="font-size:1.5vmin;color:#534e42;letter-spacing:.4vmin">SEALED UNIVERSE — GAME ONE — VERTICAL SLICE</p>
+  <div class="cont">KEEP EXPLORING THE HOUSE</div>
+</div>
+
+<div id="fade" class="show"></div>
+
+<div id="title">
+  <canvas class="wall" id="titleWall"></canvas>
+  <h1>THE WEEPING WALLS</h1>
+  <h2>SEALED UNIVERSE&ensp;·&ensp;GAME ONE</h2>
+  <button class="start">BEGIN</button>
+  <div class="note">WASD — move&ensp;·&ensp;MOUSE — look&ensp;·&ensp;E — interact&ensp;·&ensp;J — journal&ensp;·&ensp;SHIFT — walk faster<br>
+  headphones recommended&ensp;·&ensp;act one — vertical slice</div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "./lib/three.module.js" } }
+</script>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

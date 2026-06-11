@@ -23,6 +23,7 @@ export const journal = {
       this.renderNotes();
       this.renderPlan();
       this.renderAudio();
+      this.renderItems();
       if (this.audio) this.audio.paper();
     }
     return this.open;
@@ -33,7 +34,18 @@ export const journal = {
       el.classList.toggle('on', el.dataset.tab === tab));
     $('pageNotes').style.display = tab === 'notes' ? 'block' : 'none';
     $('pageAudio').style.display = tab === 'audio' ? 'block' : 'none';
+    $('pageItems').style.display = tab === 'items' ? 'block' : 'none';
     $('pagePlan').style.display  = tab === 'plan'  ? 'block' : 'none';
+  },
+
+  renderItems(){
+    const page = $('pageItems');
+    page.innerHTML = state.inventory.map(it => `
+      <div class="invItem">
+        <div class="nm">${esc(it.name)}</div>
+        <div class="ds">${esc(it.desc)}</div>
+      </div>`).join('') ||
+      '<div class="entry">Pockets: three iron keys, a phone with no signal worth keeping, and a press pass I should throw away.</div>';
   },
 
   note(text, { frag = false, t = null } = {}){
@@ -81,8 +93,8 @@ export const journal = {
     const c = $('planCanvas'), x = c.getContext('2d');
     x.clearRect(0, 0, c.width, c.height);
     x.save();
-    // pencil-on-paper transform: house x[-13..13] z[-10..11] → canvas
-    const sx = 22, sz = 18, ox = c.width/2, oz = 230;
+    // pencil-on-paper transform: house x[-19..13] z[-10..11] → canvas
+    const sx = 19, sz = 18, ox = c.width/2 + 30, oz = 230;
     const px = (wx, wz) => [ox + wx * sx, oz - wz * sz * -1];
     x.strokeStyle = '#4a4438'; x.lineWidth = 1.6;
     x.font = '11px Georgia'; x.fillStyle = '#5a5142';
@@ -102,10 +114,15 @@ export const journal = {
     if (!drawn){
       x.fillText('(nothing surveyed yet)', 60, 60);
     }
-    // the west wing — marked but unmapped
-    if (state.visited['corridor']){
+    // the west wing — marked but unmapped, until it isn't
+    if (state.visited['westwing']){
       x.fillStyle = '#6e1f1f';
-      x.fillText('WEST WING — LOCKED. NONE OF THE KEYS FIT?', 30, 415);
+      x.fillText('WEST WING: CORRIDOR 14FT TOO LONG. MEASURED TWICE.', 30, 415);
+    } else if (state.visited['corridor']){
+      x.fillStyle = '#6e1f1f';
+      x.fillText(state.clockSolved
+        ? 'WEST WING — THE IRON KEY. W.'
+        : 'WEST WING — LOCKED. NONE OF THE KEYS FIT?', 30, 415);
     }
     if (state.visited['gallery']){
       x.fillStyle = '#5a5142';

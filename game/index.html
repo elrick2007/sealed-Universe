@@ -113,6 +113,78 @@
   #review .close{position:absolute;top:12px;right:18px;cursor:pointer;color:#555;
     letter-spacing:1px;font-size:12px;}
 
+  /* ---------- pause / settings ---------- */
+  #pause{position:absolute;inset:0;z-index:36;display:none;background:rgba(4,3,4,.86);}
+  #pause .panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(460px,92vw);background:#0e0d10;border:1px solid #2e2a22;
+    box-shadow:0 14px 60px #000;padding:34px 40px;color:#a89c7e;}
+  #pause h3{font-weight:normal;font-size:16px;letter-spacing:5px;color:#cfc6ae;
+    border-bottom:1px solid #26231c;padding-bottom:14px;margin-bottom:20px;}
+  #pause .row{display:flex;align-items:center;justify-content:space-between;
+    padding:11px 0;font-size:13px;letter-spacing:2px;color:#7d745f;}
+  #pause input[type=range]{width:170px;accent-color:#c9982f;background:transparent;}
+  #pause select{background:#16141a;color:#a89c7e;border:1px solid #3a352c;
+    font-family:inherit;font-size:12px;letter-spacing:1px;padding:5px 8px;}
+  #pause .btn{display:block;width:100%;margin-top:14px;text-align:center;
+    border:1px solid #3a352c;background:none;color:#8a8374;font-family:inherit;
+    font-size:13px;letter-spacing:3px;padding:12px;cursor:pointer;transition:all .3s;}
+  #pause .btn:hover{color:#d8d0bc;border-color:#8a8374;background:#15130f;}
+  #pause .btn.danger:hover{color:#c96a5a;border-color:#6e1f1f;}
+  #pause .keys{margin-top:18px;font-size:11px;letter-spacing:1px;color:#4e4a40;
+    line-height:2;text-align:center;}
+
+  /* ---------- piano puzzle ---------- */
+  #piano{position:absolute;inset:0;z-index:34;display:none;background:rgba(3,3,4,.88);}
+  #piano .case{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(620px,94vw);background:#0c0b0d;border:1px solid #2a2620;
+    box-shadow:0 14px 60px #000;padding:30px 36px;text-align:center;}
+  #piano h3{font-weight:normal;font-size:14px;letter-spacing:4px;color:#a89c7e;
+    margin-bottom:8px;}
+  #piano .hint{font-size:13px;font-style:italic;color:#5d5648;margin-bottom:22px;
+    letter-spacing:1px;}
+  #pianoKeys{display:flex;justify-content:center;gap:5px;}
+  #pianoKeys .pk{width:54px;height:140px;background:#d8d0bc;border:1px solid #1a1813;
+    cursor:pointer;display:flex;align-items:flex-end;justify-content:center;
+    padding-bottom:10px;font-size:12px;letter-spacing:1px;color:#3a352c;
+    transition:background .1s;user-select:none;}
+  #pianoKeys .pk:hover{background:#efe8d4;}
+  #pianoKeys .pk:active,#pianoKeys .pk.down{background:#b3a888;}
+  #pianoKeys .pk.black{background:#17140f;color:#8a8374;height:96px;width:44px;
+    align-self:flex-start;}
+  #pianoKeys .pk.black:hover{background:#262017;}
+  #pianoSeq{margin-top:22px;height:20px;font-size:15px;letter-spacing:8px;
+    color:#c9982f;}
+  #piano .close{margin-top:18px;font-size:11px;letter-spacing:2px;color:#4e4a40;
+    cursor:pointer;}
+
+  /* ---------- clock puzzle ---------- */
+  #clockUI{position:absolute;inset:0;z-index:34;display:none;background:rgba(3,3,4,.88);}
+  #clockUI .case{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(440px,94vw);background:#0c0b0d;border:1px solid #2a2620;
+    box-shadow:0 14px 60px #000;padding:30px 36px;text-align:center;}
+  #clockUI h3{font-weight:normal;font-size:14px;letter-spacing:4px;color:#a89c7e;
+    margin-bottom:6px;}
+  #clockUI .hint{font-size:13px;font-style:italic;color:#5d5648;margin-bottom:16px;}
+  #clockFace{display:block;margin:0 auto;background:#0a0908;}
+  #clockUI .dials{display:flex;justify-content:center;gap:26px;margin-top:18px;
+    font-size:13px;letter-spacing:2px;color:#7d745f;}
+  #clockUI .dials button{background:#16141a;border:1px solid #3a352c;color:#a89c7e;
+    font-family:inherit;font-size:14px;width:34px;height:30px;cursor:pointer;}
+  #clockUI .dials button:hover{color:#d8d0bc;border-color:#8a8374;}
+  #clockSet{margin-top:20px;border:1px solid #3a352c;background:none;color:#8a8374;
+    font-family:inherit;font-size:13px;letter-spacing:3px;padding:11px 38px;
+    cursor:pointer;transition:all .3s;}
+  #clockSet:hover{color:#d8d0bc;border-color:#8a8374;background:#15130f;}
+  #clockUI .close{margin-top:16px;font-size:11px;letter-spacing:2px;color:#4e4a40;
+    cursor:pointer;}
+
+  /* ---------- inventory page ---------- */
+  .invItem{display:flex;gap:16px;align-items:baseline;padding:14px 4px;
+    border-bottom:1px dashed #b3a888;}
+  .invItem .nm{font-size:14px;letter-spacing:2px;color:var(--blood);flex:none;
+    font-style:normal;}
+  .invItem .ds{font-size:15px;font-style:italic;line-height:24px;}
+
   /* ---------- end card ---------- */
   #endcard{position:absolute;inset:0;z-index:45;background:#050506;display:none;
     flex-direction:column;align-items:center;justify-content:center;opacity:0;
@@ -144,10 +216,12 @@
     <div class="tabs">
       <div data-tab="notes" class="on">NOTES</div>
       <div data-tab="audio">AUDIO LOG</div>
+      <div data-tab="items">ITEMS</div>
       <div data-tab="plan">FLOOR PLAN</div>
     </div>
     <div class="page" id="pageNotes"></div>
     <div class="page" id="pageAudio" style="display:none"></div>
+    <div class="page" id="pageItems" style="display:none"></div>
     <div class="page" id="pagePlan" style="display:none">
       <canvas id="planCanvas" width="700" height="460"></canvas>
     </div>
@@ -176,6 +250,60 @@
   <div class="cont">KEEP EXPLORING THE HOUSE</div>
 </div>
 
+<div id="endcard2" style="position:absolute;inset:0;z-index:45;background:#050506;display:none;
+  flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity 3s;">
+  <p style="color:#b8b2a4;font-size:3.4vmin;letter-spacing:1vmin;margin:1.2vmin;text-align:center">THE CORRIDOR IS TOO LONG</p>
+  <p style="color:#8d8678;font-size:2.2vmin;letter-spacing:.5vmin;font-style:italic;margin:1.2vmin;text-align:center;line-height:4vmin">
+     Fourteen feet of corridor. Eight feet of room.<br>
+     Six feet of something else.<br><br>
+     WHAT BREATHES IN THE WEST — Sealed Universe: Game Two.</p>
+  <div class="cont2" style="margin-top:7vmin;font-size:1.8vmin;color:#6a6354;cursor:pointer;
+    border:1px solid #33302a;padding:1.2vmin 3vmin;letter-spacing:.3vmin">STEP BACK</div>
+</div>
+
+<div id="pause">
+  <div class="panel">
+    <h3>PAUSED</h3>
+    <div class="row"><span>VOLUME</span><input type="range" id="setVol" min="0" max="100" value="100"></div>
+    <div class="row"><span>LOOK SENSITIVITY</span><input type="range" id="setSens" min="30" max="200" value="100"></div>
+    <div class="row"><span>GRAPHICS</span>
+      <select id="setQual">
+        <option value="psx">HAUNTED — 240p · heavy grain</option>
+        <option value="enhanced">RESTORED — 480p · fine grain</option>
+      </select>
+    </div>
+    <button class="btn" id="resumeBtn">RESUME</button>
+    <button class="btn danger" id="resetSave">RESET JOURNAL &amp; SAVE</button>
+    <div class="keys">WASD / ARROWS — move · ←→ — turn · MOUSE — look · SHIFT — faster<br>
+      E — interact · J — journal · ESC — pause</div>
+  </div>
+</div>
+
+<div id="piano">
+  <div class="case">
+    <h3>THE PIANO</h3>
+    <div class="hint">Four notes are circled on the sheet music, in faded ink. Play them in order.</div>
+    <div id="pianoKeys"></div>
+    <div id="pianoSeq"></div>
+    <div class="close">ESC — step away</div>
+  </div>
+</div>
+
+<div id="clockUI">
+  <div class="case">
+    <h3>THE LONG-CASE CLOCK</h3>
+    <div class="hint" id="clockHint">The winding key fits. The hands will move now — to the right time.</div>
+    <canvas id="clockFace" width="220" height="220"></canvas>
+    <div class="dials">
+      <span>HOUR <button data-d="h-1">−</button> <button data-d="h1">+</button></span>
+      <span>MINUTE <button data-d="m-10">−10</button> <button data-d="m-1">−</button>
+        <button data-d="m1">+</button> <button data-d="m10">+10</button></span>
+    </div>
+    <button id="clockSet">SET THE CLOCK</button>
+    <div class="close">ESC — step away</div>
+  </div>
+</div>
+
 <div id="fade" class="show"></div>
 
 <div id="title">
@@ -183,7 +311,7 @@
   <h1>THE WEEPING WALLS</h1>
   <h2>SEALED UNIVERSE&ensp;·&ensp;GAME ONE</h2>
   <button class="start">BEGIN</button>
-  <div class="note">WASD — move&ensp;·&ensp;MOUSE — look&ensp;·&ensp;E — interact&ensp;·&ensp;J — journal&ensp;·&ensp;SHIFT — walk faster<br>
+  <div class="note">WASD / ARROW KEYS — move&ensp;·&ensp;MOUSE or ← → — look&ensp;·&ensp;E — interact&ensp;·&ensp;J — journal&ensp;·&ensp;SHIFT — walk faster&ensp;·&ensp;ESC — pause<br>
   headphones recommended&ensp;·&ensp;act one — vertical slice</div>
 </div>
 

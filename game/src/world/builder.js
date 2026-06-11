@@ -148,6 +148,7 @@ export class Builder {
   light(x, y, z, color = 0xffd9a0, intensity = 1, distance = 9){
     const l = new THREE.PointLight(color, intensity, distance, 1.6);
     l.position.set(x, y, z);
+    l.userData.base = intensity;     // flicker system modulates around this
     this.scene.add(l);
     return l;
   }

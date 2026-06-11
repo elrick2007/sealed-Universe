@@ -14,7 +14,24 @@ export const state = {
   audioLog: [],            // {label, mark, kind}
   stair7Done: false,
   keysExamined: false,
+  // puzzle chain
+  inventory: [],           // {id, name, desc}
+  shelfExamined: false,
+  panelFound: false,
+  pianoSolved: false,
+  clockSolved: false,
+  westWingOpened: false,
 };
+
+export function hasItem(id){
+  return state.inventory.some(it => it.id === id);
+}
+
+export function addItem(id, name, desc){
+  if (hasItem(id)) return;
+  state.inventory.push({ id, name, desc });
+  save();
+}
 
 export function save(){
   try {
@@ -24,6 +41,10 @@ export function save(){
       recordersPlaced: state.recordersPlaced,
       slept: state.slept, heardVoice: state.heardVoice,
       visited: state.visited, notes: state.notes, audioLog: state.audioLog,
+      inventory: state.inventory,
+      shelfExamined: state.shelfExamined, panelFound: state.panelFound,
+      pianoSolved: state.pianoSolved, clockSolved: state.clockSolved,
+      westWingOpened: state.westWingOpened,
     }));
   } catch(e){ /* private mode etc. */ }
 }

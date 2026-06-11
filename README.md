@@ -19,12 +19,12 @@ Headphones strongly recommended.
 
 | Input | Action |
 |---|---|
-| Mouse | Look |
-| W A S D | Move |
+| Mouse / ← → | Look · turn |
+| W A S D / ↑ ↓ | Move (fully playable on arrow keys alone) |
 | Shift | Move faster |
 | E | Interact |
-| J | Journal (notes · audio log · floor plan) |
-| Esc | Close the recorder review deck |
+| J | Journal (notes · audio log · items · floor plan) |
+| Esc | Pause menu (volume · sensitivity · graphics) / close overlays |
 
 ## What's in the slice (Act 1 — Arrival)
 
@@ -35,8 +35,16 @@ Headphones strongly recommended.
 - **The kitchen wall** — press your palm against it
 - Place four voice recorders, work past midnight at the kitchen table
 - Review the overnight tapes: **02:47:16**
-- Auto-writing journal with Mara's notes, audio log, and a floor plan that
-  sketches itself room by room
+- **The puzzle chain** — what the walls are hiding:
+  - the sheet music names four notes; the piano remembers them
+  - the winding key fits the stopped clock; she speaks at one hour only
+  - the iron key is stamped **W** — and the west wing corridor is
+    fourteen feet longer than the house
+  - knock on the roses behind the pulled library shelf
+- Auto-writing journal with Mara's notes, audio log, found items, and a
+  floor plan that sketches itself room by room
+- Pause menu: volume, look sensitivity, and two looks — HAUNTED
+  (240p, heavy grain) or RESTORED (480p, fine grain)
 
 ## How it's built
 
@@ -48,9 +56,12 @@ game/
   index.html              shell, HUD, journal, review deck, title & end cards
   lib/three.module.js     three.js r160 (vendored)
   src/
-    engine/renderer.js    PSX pipeline: 240p render target, ordered dither,
-                          posterise, grain, vertex snapping
-    engine/controls.js    first-person controller, AABB collision, stairs
+    engine/renderer.js    PSX pipeline: 240p/480p render target, ordered
+                          dither, posterise, grain, candle-flicker, vertex
+                          snapping
+    engine/controls.js    first-person controller (WASD + arrows), velocity
+                          smoothing, filtered mouse look, AABB collision,
+                          stairs
     world/textures.js     all surfaces painted procedurally on canvases
                           (implements the bible's Section 10 prompts in code)
     world/builder.js      walls-with-holes, floors, doors, colliders
@@ -59,7 +70,9 @@ game/
                           breathing wall, Eleanor's four-note theme, and the
                           2:47 AM "voice-shaped silence" (formant-filtered
                           noise — speech with the consonants stripped)
-    game/                 state, HUD, journal, recorder deck, Act 1 script
+    game/                 state, HUD, journal, recorder deck, Act 1 script,
+                          and puzzles.js — the piano / clock / west-wing
+                          chain and the hollow library panel
 ```
 
 Design source: [`docs/GAME_BIBLE.md`](docs/GAME_BIBLE.md) (full bible, v1.1).

@@ -2,10 +2,11 @@
 // Free exploration → the kitchen wall breathes → recorders placed in four
 // rooms → sleep → the 2:47 AM capture. Then the slice's end card.
 import * as THREE from 'three';
-import { state, save } from './state.js';
+import { state, save, hasItem } from './state.js';
 import { hud } from './hud.js';
 import { journal } from './journal.js';
 import { recorder } from './recorder.js';
+import { puzzles } from './puzzles.js';
 
 const RECORDER_SPOTS = {
   kitchen: { pos: [-11.2, 1.0, -7.4], label: 'kitchen counter' },
@@ -58,17 +59,36 @@ export class Act1 {
       journal.note('Portrait in the hall: a woman, 1880s dress, dark eyes that don’t leave you alone. Someone took something sharp to her name plate. You don’t scratch out a dead woman’s name unless the name can still do something.');
     }, { once: true });
 
-    /* ---- the clock ---- */
+    /* ---- the clock (puzzle: 2:47 once the winding key is found) ---- */
+    let clockExamined = false;
     this.add([2.55, 1.2, 9.6], 1.4, 'Check the clock  [E]', () => {
-      hud.caption('A long-case clock. Stopped. The hands say 3:00. My phone says it isn’t.', 4);
-      journal.note('Hall clock stopped at 3:00. Wound it. It ticked nine times and stopped at 3:00 again. Leaving it.');
-    }, { once: true });
+      if (state.clockSolved){
+        hud.caption('The clock is ticking. 2:47, and counting. The drawer in the base sits open and empty.', 4.5);
+        return;
+      }
+      if (hasItem('windingKey')){
+        puzzles.openClock();
+        return;
+      }
+      hud.caption('A long-case clock. Stopped. The hands say 3:00. My phone says it isn’t. The hands are stiff — they’d want winding, and the winding key is missing.', 5.5);
+      if (!clockExamined){
+        clockExamined = true;
+        journal.note('Hall clock stopped at 3:00. The winding key is gone from its hook inside the case. Somebody took it somewhere. Leaving it. For now.');
+      }
+    });
 
     /* ---- library: pulled shelf ---- */
     this.add([-10.9, 1.3, 9.3], 1.7, 'Look behind the shelf  [E]', () => {
       hud.caption('Someone pulled this shelf from the wall. Behind it — wallpaper. Roses and thorns. Different pattern from everywhere else. Older.', 5);
       journal.note('Library: one shelf section pulled out from the wall. Behind it, roses-and-thorns paper. Hand-printed, older than the ferns everywhere else. Different pattern. Older. Why here?');
+      state.shelfExamined = true;
+      save();
     }, { once: true });
+
+    /* ---- library: the hollow panel behind the roses ---- */
+    this.add([-11.4, 1.3, 9.3], 1.5, 'Knock on the rose wallpaper  [E]', () => {
+      puzzles.knockPanel();
+    }, { once: true, prio: 1, when: () => state.shelfExamined && !state.panelFound });
 
     /* ---- library: blank spines ---- */
     this.add([-9.4, 1.3, 5.4], 1.6, 'Examine the books  [E]', () => {
@@ -90,11 +110,21 @@ export class Act1 {
       journal.note('Dr. Whitmore’s book, annotated in his own hand. “Accumulated emotional material.” “Testimonial compression.” He was measuring something in this house and he never told anyone what.');
     }, { once: true });
 
-    /* ---- drawing room: piano ---- */
-    this.add([10.4, 1, 7.5], 1.9, 'Look at the piano  [E]', () => {
-      hud.caption('Sheet music, 1880s, handwritten. The stool is pulled back — as if someone just stood up.', 4.5);
-      journal.note('Grand piano, lid open, handwritten sheet music on the stand. The keys are clean. Everything else in this room wears a year of dust.');
+    /* ---- drawing room: the sheet music (the piano clue) ---- */
+    this.add([10.4, 1, 7.5], 1.9, 'Read the sheet music  [E]', () => {
+      A.paper();
+      hud.caption('Handwritten, 1880s. Four notes are circled in faded ink, numbered in a careful hand: E — G — F♯ — D. The stool is pulled back, as if someone just stood up.', 6.5);
+      journal.note('Grand piano, lid open, handwritten sheet music. Four notes circled and NUMBERED: E, G, F-sharp, D. The keys are clean; everything else in this room wears a year of dust. Someone wants this played.');
     }, { once: true });
+
+    /* ---- drawing room: play the piano (puzzle) ---- */
+    this.add([9.3, 1, 7.4], 1.4, 'Play the piano  [E]', () => {
+      if (state.pianoSolved){
+        hud.caption('The compartment under the keyboard sits open. The piano has given what it was keeping.', 4);
+        return;
+      }
+      puzzles.openPiano();
+    }, { prio: 1 });
 
     /* ---- dining room: mirror ---- */
     this.add([11.8, 1.6, 2.5], 1.7, 'Look in the mirror  [E]', () => {
@@ -108,13 +138,31 @@ export class Act1 {
       journal.note('A child’s drawing pinned to the breakfast room door. The house. Thirteen windows — a child counted them too. There is a figure drawn in one window. I worked out which window it is. I was standing in it.', { frag: false });
     }, { once: true });
 
-    /* ---- west wing door ---- */
+    /* ---- west wing door — the end of the puzzle chain ---- */
+    let westNoted = false;
     this.add([-11.6, 1.1, -1.5], 1.6, 'Try the west wing door  [E]', () => {
+      if (hasItem('ironKeyW')){
+        A.keys();
+        hud.caption('The iron key turns once, twice — a lock with two throws, like a cell. The door swings out at me. Cold air. Roses.', 6);
+        setTimeout(() => {
+          A.unlock(); A.doorCreak(true);
+          W.doors.westWing.locked = false;
+          W.doors.westWing.open();
+          state.westWingOpened = true;
+          hud.objective('Walk the west corridor');
+          journal.note('The W key fits the west wing door. Double-throw lock — you lock a door like that to keep something IN. Opening it anyway. If I stop to think about the hinges again I will lose my nerve.');
+          save();
+        }, 1800);
+        return;
+      }
       A.keys();
       hud.caption('Locked. None of the three keys fit. The hinges are on this side — it opens outward, into the corridor. That’s wrong.', 5.5);
-      journal.note('West wing door: solid oak, no window, locked, and none of the keys fit. Hinges on the corridor side, so it opens OUT. Doors open into rooms. Unless the room needs to let something out — stop. Noting it and moving on. The air near the keyhole smells of roses.');
+      if (!westNoted){
+        westNoted = true;
+        journal.note('West wing door: solid oak, no window, locked, and none of the keys fit. Hinges on the corridor side, so it opens OUT. Doors open into rooms. Unless the room needs to let something out — stop. Noting it and moving on. The air near the keyhole smells of roses.');
+      }
       hud.objective(state.kitchenWallFelt ? 'Set up the recorders' : 'Look around the house');
-    });
+    }, { when: () => !state.westWingOpened });
 
     /* ---- THE KITCHEN WALL ---- */
     this.add([-11.5, 1.4, -6], 1.8, 'Press your palm against the wall  [E]', () => {
@@ -265,7 +313,16 @@ export class Act1 {
       card.querySelector('.cont').addEventListener('click', () => {
         card.classList.remove('show');
         setTimeout(() => { card.style.display = 'none'; }, 800);
-        hud.objective('The house is yours until December 2nd');
+        // the timestamp is the clock puzzle's answer — point the player back in
+        if (state.westWingOpened){
+          hud.objective('The house is yours until December 2nd');
+        } else if (state.clockSolved){
+          hud.objective('Open the west wing door');
+        } else if (hasItem('windingKey')){
+          hud.objective('2:47 — the clock wants to remember it');
+        } else {
+          hud.objective('The house is hiding things — start with the piano');
+        }
       }, { once: true });
     }, 8500);
   }
@@ -324,7 +381,7 @@ export class Act1 {
     }
 
     // interaction prompt
-    if (!journal.open && !recorder.open && this.wallSeqT < 0 && state.phase !== 'sleeping'){
+    if (!journal.open && !recorder.open && !puzzles.open && this.wallSeqT < 0 && state.phase !== 'sleeping'){
       const hit = this._nearest();
       hud.prompt(hit ? hit.prompt : null);
       this._hit = hit;

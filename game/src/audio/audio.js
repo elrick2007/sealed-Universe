@@ -12,7 +12,7 @@ export class AudioEngine {
     this.started = true;
     const ctx = this.ctx = new (window.AudioContext || window.webkitAudioContext)();
     this.master = ctx.createGain();
-    this.master.gain.value = 0.9;
+    this.master.gain.value = 0.9 * (this._pendingVol ?? 1);
     const comp = ctx.createDynamicsCompressor();
     this.master.connect(comp); comp.connect(ctx.destination);
 
@@ -193,6 +193,66 @@ export class AudioEngine {
       this._env(g, t + i*0.16, 0.004, 0.06, 0.09);
       o.start(t + i*0.16); o.stop(t + i*0.16 + 0.12);
     });
+  }
+
+  setVolume(v){ // 0..1 — settings menu
+    if (!this.started){ this._pendingVol = v; return; }
+    this.master.gain.linearRampToValueAtTime(0.9 * v, this.ctx.currentTime + 0.1);
+  }
+
+  /* ---------- puzzle one-shots ---------- */
+  pianoNote(freq, vol = 0.12){
+    if (!this.started) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    // two slightly detuned triangles — an old, not-quite-tuned upright
+    [0, 3.5].forEach(det => {
+      const o = ctx.createOscillator(); o.type = 'triangle';
+      o.frequency.value = freq; o.detune.value = det;
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 2200;
+      const g = ctx.createGain();
+      o.connect(f); f.connect(g); g.connect(this.master); g.connect(this.verb);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      o.start(t); o.stop(t + 1.7);
+    });
+  }
+
+  wrongNotes(){ // dissonant cluster — puzzle reset
+    if (!this.started) return;
+    [138.6, 146.8, 155.6].forEach(fr => this.pianoNote(fr, 0.07));
+  }
+
+  hollowKnock(){ // knuckles on a wall with nothing behind it
+    if (!this.started) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    [0, 0.22].forEach((dt, i) => {
+      const o = ctx.createOscillator(); o.frequency.value = i ? 96 : 120;
+      const g = ctx.createGain();
+      o.connect(g); g.connect(this.master); g.connect(this.verb);
+      this._env(g, t + dt, 0.004, 0.14, 0.32);
+      o.start(t + dt); o.stop(t + dt + 0.4);
+    });
+  }
+
+  mechanism(){ // hidden drawer / compartment sliding open
+    if (!this.started) return;
+    const ctx = this.ctx, t = ctx.currentTime;
+    const s = this._noiseSrc(false);
+    const f = ctx.createBiquadFilter(); f.type = 'bandpass';
+    f.frequency.setValueAtTime(300, t);
+    f.frequency.linearRampToValueAtTime(700, t + 0.5);
+    f.Q.value = 3;
+    const g = ctx.createGain();
+    s.connect(f); f.connect(g); g.connect(this.master); g.connect(this.verb);
+    this._env(g, t, 0.03, 0.08, 0.55);
+    s.start(t); s.stop(t + 0.7);
+    // the latch
+    const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 420;
+    const og = ctx.createGain();
+    o.connect(og); og.connect(this.master);
+    this._env(og, t + 0.5, 0.003, 0.05, 0.06);
+    o.start(t + 0.5); o.stop(t + 0.62);
   }
 
   click(){ // recorder / UI

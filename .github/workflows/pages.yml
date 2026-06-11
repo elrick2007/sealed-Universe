@@ -2,7 +2,7 @@ name: Deploy site to GitHub Pages
 
 on:
   push:
-    branches: [main, claude/admiring-dijkstra-k0boh2]
+    branches: [main, claude/beautiful-cerf-6bamjp]
   workflow_dispatch:
 
 permissions:

@@ -65,7 +65,8 @@ export function buildManor(B, scene){
   B.wall(-12.6, 10.6, 12.6, 10.6, 0, shellH, M.stone,
     [{ at: 12.6, w: 1.3, h: 2.5 }]);                               // front, door hole
   B.wall(-12.6, -9.6, 12.6, -9.6, 0, shellH, M.stone);             // back
-  B.wall(-12.6, -9.6, -12.6, 10.6, 0, shellH, M.stone);            // west
+  // west shell wall — pierced where the west wing corridor passes through
+  B.wall(-12.6, -9.6, -12.6, 10.6, 0, shellH, M.stone, [{ at: 8.1, w: 3.0, h: 3.0 }]);
   B.wall(12.6, -9.6, 12.6, 10.6, 0, shellH, M.stone);              // east
   // roof mass
   B.box(M.dark, 26, 1.4, 21.4, 0, shellH + 0.7, 0.5, { collide: false });
@@ -286,6 +287,41 @@ export function buildManor(B, scene){
   B.wall(-12, -3, -12, 0, 0, H, M.panel, [{ at: 1.5, w: 1.15, h: 2.15 }]);
   world.doors.westWing = B.door(-12, -1.5, false, M.panel, { locked: true, w: 1.1, h: 2.12, name: 'westWing' });
 
+  /* ---- west wing corridor x[-19..-12] z[-3..0] — behind the locked door.
+     The bible says the corridor is fourteen feet too long. It is. ---- */
+  B.floor(-19, -3, -12, 0, 0.001, M.woodDark);
+  B.ceiling(-19, -3, -12, 0, 2.6, M.plasterD);                     // lower than everywhere else
+  B.wall(-19, 0, -12, 0, 0, 2.6, M.rose);                          // the older paper, both sides
+  B.wall(-19, -3, -12, -3, 0, 2.6, M.rose);
+  B.wall(-19, -3, -19, 0, 0, 2.6, M.plasterD);                     // end wall
+  // the second breathing wall — at the far end, waiting
+  const breathWall2 = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 2.6),
+    psxMaterial(new THREE.MeshLambertMaterial({ map: T.plaster })));
+  breathWall2.position.set(-18.9, 1.3, -1.5); breathWall2.rotation.y = Math.PI/2;
+  scene.add(breathWall2);
+  world.breathingWalls.push(breathWall2);
+  world.props.breathWall2 = breathWall2;
+  // a door painted onto the end wall — frame, panels, no hinges, no handle
+  B.decal(T.panelling, 1.1, 2.1, -18.85, 1.05, -1.5, Math.PI/2);
+  // the dress form, facing the false door (Act 2 tease)
+  const dressForm = new THREE.Group();
+  const dfBody = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.26, 0.85, 7), M.linen);
+  dfBody.position.y = 1.05; dressForm.add(dfBody);
+  const dfNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.18, 5), M.woodDark);
+  dfNeck.position.y = 1.56; dressForm.add(dfNeck);
+  const dfPole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.65, 5), M.woodDark);
+  dfPole.position.y = 0.32; dressForm.add(dfPole);
+  dressForm.position.set(-17.9, 0, -0.6);
+  scene.add(dressForm);
+  B.collider(-18.2, -17.6, 0, 1.7, -0.9, -0.3);
+  world.props.dressForm = dressForm;
+
+  /* ---- west wing exterior mass — the hulking dark wing seen from the drive ---- */
+  B.wall(-20, 2, -12.6, 2, 0, 7, M.stone);
+  B.wall(-20, -5, -12.6, -5, 0, 7, M.stone);
+  B.wall(-20, -5, -20, 2, 0, 7, M.stone);
+  B.box(M.dark, 8.2, 1.2, 7.8, -16.3, 7.4, -1.5, { collide: false });
+
   // ---- kitchen x[-12..-4] z[-9..-3] ----
   B.floor(-12, -9, -4, -3, 0.001, M.flag);
   B.ceiling(-12, -9, -4, -3, H, M.plaster);
@@ -425,6 +461,7 @@ export function buildManor(B, scene){
   L.gallery   = B.light(0, F2 + 2.4, 5, 0xd9be8a, 10, 11);
   L.bedroom   = B.light(7.5, F2 + 2.4, 7.5, 0xe6c88e, 10, 9);
   L.bathroom  = B.light(7.5, F2 + 2.4, 2.5, 0xb8c4c2, 7, 8);
+  L.westwing  = B.light(-14.2, 2.3, -1.5, 0x8a6a4a, 3.5, 6);  // dim — the end stays dark
 
   /* ============ ROOM REGIONS (floor plan / ambience) ============ */
   world.rooms = [
@@ -435,6 +472,7 @@ export function buildManor(B, scene){
     { id:'drawing',   name:'DRAWING ROOM',    minX:3, maxX:12, minZ:5, maxZ:10, floor:0 },
     { id:'dining',    name:'DINING ROOM',     minX:3, maxX:12, minZ:0, maxZ:5, floor:0 },
     { id:'corridor',  name:'BACK CORRIDOR',   minX:-12, maxX:3, minZ:-3, maxZ:0, floor:0 },
+    { id:'westwing',  name:'THE WEST WING',   minX:-19, maxX:-12, minZ:-3, maxZ:0, floor:0 },
     { id:'kitchen',   name:'KITCHEN',         minX:-12, maxX:-4, minZ:-9, maxZ:-3, floor:0 },
     { id:'breakfast', name:'BREAKFAST ROOM',  minX:-4, maxX:3, minZ:-9, maxZ:-3, floor:0 },
     { id:'gallery',   name:'SECOND FLOOR',    minX:-3, maxX:3, minZ:0, maxZ:10, floor:1 },

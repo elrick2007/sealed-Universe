@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEALED UNIVERSE — A Six-Game Horror Series</title>
+<meta name="description" content="Sealed Universe: a six-part gothic horror anthology. Game One — The Weeping Walls — is playable now, free, in your browser.">
+<style>
+  :root{
+    --bg:#0b0b0d; --plaster:#141417; --ink:#b8b2a4; --dim:#5d5648;
+    --blood:#6e1f1f; --amber:#c9982f; --green:#2e362c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;
+    overflow-x:hidden;}
+  #wall{position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none;}
+  main{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- hero ---------- */
+  header{min-height:88vh;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;text-align:center;}
+  header .series{font-size:clamp(11px,1.4vw,14px);letter-spacing:.9em;color:var(--dim);
+    margin-bottom:26px;padding-left:.9em;}
+  header h1{font-size:clamp(40px,7.5vw,86px);font-weight:normal;letter-spacing:.18em;
+    color:#cfc8b8;text-shadow:0 0 26px rgba(110,31,31,.4),0 2px 0 #000;
+    padding-left:.18em;}
+  header .tag{margin-top:30px;font-style:italic;color:#7d7666;font-size:clamp(15px,1.9vw,19px);
+    line-height:1.8;max-width:560px;}
+  header .down{margin-top:64px;color:var(--dim);font-size:12px;letter-spacing:.4em;
+    text-decoration:none;border:1px solid #2c2a24;padding:14px 30px;transition:all .4s;}
+  header .down:hover{color:var(--ink);border-color:var(--dim);}
+
+  /* ---------- about ---------- */
+  .about{padding:90px 0 30px;max-width:720px;margin:0 auto;}
+  .about p{font-size:17px;line-height:2;color:#968e7c;margin-bottom:26px;}
+  .about p em{color:#b3ab98;}
+  .rule{width:90px;height:1px;background:#3a352c;margin:40px auto;}
+
+  /* ---------- games ---------- */
+  .games{padding:50px 0 90px;}
+  .games h2{text-align:center;font-weight:normal;letter-spacing:.5em;font-size:15px;
+    color:var(--dim);margin-bottom:60px;padding-left:.5em;}
+  .card{display:flex;gap:42px;background:rgba(16,16,18,.82);border:1px solid #232118;
+    margin-bottom:34px;padding:38px;align-items:center;}
+  .card.sealed{opacity:.78;}
+  .card .art{flex:0 0 320px;height:200px;border:1px solid #2a271f;position:relative;
+    overflow:hidden;background:#0a0a0b;}
+  .card .art img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;
+    display:block;filter:saturate(.9);}
+  .card .body{flex:1;min-width:0;}
+  .num{font-size:11px;letter-spacing:.45em;color:var(--dim);margin-bottom:12px;}
+  .card h3{font-weight:normal;font-size:clamp(22px,3vw,30px);letter-spacing:.12em;
+    color:#cfc8b8;margin-bottom:16px;}
+  .card .desc{font-size:15px;line-height:1.9;color:#8d8574;font-style:italic;
+    margin-bottom:24px;}
+  .play{display:inline-block;text-decoration:none;font-size:13px;letter-spacing:.35em;
+    color:#d8d0bc;border:1px solid #5d5340;padding:13px 34px;transition:all .35s;
+    background:rgba(110,31,31,.12);}
+  .play:hover{background:rgba(110,31,31,.35);border-color:#8a6d3a;}
+  .soon{display:inline-block;font-size:12px;letter-spacing:.35em;color:#4e4a40;
+    border:1px dashed #2e2b24;padding:12px 28px;}
+  .meta{margin-top:18px;font-size:12px;color:#46423a;letter-spacing:.15em;}
+
+  /* sealed card art: wax seal */
+  .sealmark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+  .sealmark .wax{width:96px;height:96px;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, #5a1a1a, #340e0e 70%);
+    box-shadow:0 4px 18px #000, inset 0 2px 6px rgba(255,255,255,.08);
+    display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);}
+  .wax span{font-size:10px;letter-spacing:.3em;color:#1d0808;font-weight:bold;
+    text-align:center;line-height:1.6;}
+  .card.sealed .art{background:
+    repeating-linear-gradient(45deg,#0c0c0e 0 10px,#0e0e10 10px 20px);}
+
+  /* ---------- footer ---------- */
+  footer{padding:60px 0 70px;text-align:center;color:#3c3930;font-size:12px;
+    letter-spacing:.2em;line-height:2.4;}
+  footer a{color:#5d5648;}
+
+  @media (max-width:760px){
+    .card{flex-direction:column;}
+    .card .art{flex:none;width:100%;}
+  }
+</style>
+</head>
+<body>
+<canvas id="wall"></canvas>
+<main>
+  <header>
+    <div class="series">A SIX-PART HORROR SERIES</div>
+    <h1>SEALED UNIVERSE</h1>
+    <p class="tag">Some houses keep what they are told.<br>
+      Six games. Six archives. One record that has been kept,<br>
+      patiently, for longer than the houses themselves.</p>
+    <a class="down" href="#games">THE GAMES</a>
+  </header>
+
+  <section class="about">
+    <p>The <em>Sealed Universe</em> is an anthology of investigative horror.
+    You are never given a weapon. You are given a voice recorder, a camera,
+    a notebook — and a place that has been waiting a very long time for
+    someone who knows how to listen.</p>
+    <p>Every game is built on the same conviction: <em>the scariest thing in
+    any room is the truth nobody wrote down.</em> The walls remember. The
+    record is incomplete. You are the witness.</p>
+    <p style="font-size:13px;color:#5d5648;">Each entry runs free in your
+    browser — no install, no downloads. First-person, headphones
+    recommended, roughly self-contained, quietly connected.</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="games" id="games">
+    <h2>THE SERIES</h2>
+
+    <!-- GAME ONE — playable -->
+    <div class="card">
+      <div class="art"><img src="site/weeping-walls.png" alt="Ashford Manor at night — thirteen windows"></div>
+      <div class="body">
+        <div class="num">GAME ONE — AVAILABLE NOW</div>
+        <h3>THE WEEPING WALLS</h3>
+        <p class="desc">Mara Voss told the truth for a living, and it cost her
+        everything. Six months in a rented Victorian manor was supposed to be
+        a place to disappear. But Ashford Manor selects its tenants. The
+        walls breathe — five seconds in, five seconds out. The west wing
+        door is locked, and hinged on the wrong side. And at 2:47 AM, the
+        recorder she left running captures a woman's voice with every
+        consonant stripped away.<br><br>
+        The house is the antagonist. Not a ghost. Not a monster. The house
+        itself — its architecture, its memory, its need to be witnessed.</p>
+        <a class="play" href="game/">ENTER THE HOUSE</a>
+        <div class="meta">ACT ONE — VERTICAL SLICE · FIRST-PERSON · HEADPHONES RECOMMENDED</div>
+      </div>
+    </div>
+
+    <!-- GAME TWO — in development -->
+    <div class="card">
+      <div class="art">
+        <div class="sealmark" style="background:linear-gradient(160deg,#101214,#0a0c0a)">
+          <div style="text-align:center;color:#3e4a42;font-style:italic;font-size:14px;
+            letter-spacing:.1em;line-height:2">fourteen feet of corridor.<br>
+            eight feet of room.<br>six feet of <span style="color:#5a6a5e">something else.</span></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="num">GAME TWO — IN DEVELOPMENT</div>
+        <h3>WHAT BREATHES IN THE WEST</h3>
+        <p class="desc">Mara stayed. Three months after the night she pressed
+        Send, she is still in the house — because the ledger now reads
+        <em>Incomplete</em>, because of a letter from Edinburgh, and because
+        of six feet of space in the west wing that no door has ever opened.
+        Something received testimony in that space before Ashford Manor had
+        walls to hold it.</p>
+        <span class="soon">IN DEVELOPMENT</span>
+      </div>
+    </div>
+
+    <!-- GAMES THREE TO SIX — sealed -->
+    <div class="card sealed">
+      <div class="art"><div class="sealmark"><div class="wax"><span>SEALED<br>·III·</span></div></div></div>
+      <div class="body">
+        <div class="num">GAME THREE</div>
+        <h3>[ RECORD SEALED ]</h3>
+        <p class="desc">An archive in Edinburgh. A keeper who has felt the same
+        frequency. The houses are not unique — and they are not alone.</p>
+        <span class="soon">TO BE UNSEALED</span>
+      </div>
+    </div>
+
+    <div class="card sealed">
+      <div class="art"><div class="sealmark"><div class="wax"><span>SEALED<br>·IV·</span></div></div></div>
+      <div class="body">
+        <div class="num">GAME FOUR</div>
+        <h3>[ RECORD SEALED ]</h3>
+        <p class="desc">Before the book, there was a library. Before the
+        library, there was a fire. Some records survived it. They should not
+        have.</p>
+        <span class="soon">TO BE UNSEALED</span>
+      </div>
+    </div>
+
+    <div class="card sealed">
+      <div class="art"><div class="sealmark"><div class="wax"><span>SEALED<br>·V·</span></div></div></div>
+      <div class="body">
+        <div class="num">GAME FIVE</div>
+        <h3>[ RECORD SEALED ]</h3>
+        <p class="desc">Forty-seven keepers served the house. One broke the
+        chain. The others are still in the walls — and they have been
+        comparing notes.</p>
+        <span class="soon">TO BE UNSEALED</span>
+      </div>
+    </div>
+
+    <div class="card sealed">
+      <div class="art"><div class="sealmark"><div class="wax"><span>SEALED<br>·VI·</span></div></div></div>
+      <div class="body">
+        <div class="num">GAME SIX</div>
+        <h3>[ RECORD SEALED ]</h3>
+        <p class="desc">The record was never about the houses. The final entry
+        is blank, and it is waiting for a name.</p>
+        <span class="soon">TO BE UNSEALED</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    SEALED UNIVERSE — an original horror anthology<br>
+    THE WEEPING WALLS runs in any modern desktop browser · WASD + mouse · E to interact · J for the journal<br>
+    <a href="docs/GAME_BIBLE.md">design bible</a>
+  </footer>
+</main>
+
+<script>
+// damp plaster + weeping streaks, painted live
+const c = document.getElementById('wall');
+function paint(){
+  c.width = innerWidth; c.height = innerHeight;
+  const x = c.getContext('2d');
+  x.fillStyle = '#0e0e10'; x.fillRect(0,0,c.width,c.height);
+  for (let i = 0; i < 2600; i++){
+    const g = 12 + Math.random()*26 | 0;
+    x.fillStyle = `rgba(${g},${g},${g+3},0.5)`;
+    x.fillRect(Math.random()*c.width, Math.random()*c.height, 2.5, 2.5);
+  }
+  for (let i = 0; i < 30; i++){
+    const sx = Math.random()*c.width;
+    const grad = x.createLinearGradient(0, 0, 0, c.height);
+    grad.addColorStop(0, 'rgba(38,42,44,0.45)');
+    grad.addColorStop(1, 'rgba(8,8,10,0)');
+    x.fillStyle = grad;
+    x.fillRect(sx, Math.random()*c.height*0.3, 1.5 + Math.random()*3, c.height);
+  }
+}
+paint();
+addEventListener('resize', paint);
+</script>
+</body>
+</html>

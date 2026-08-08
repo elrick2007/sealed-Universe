@@ -111,7 +111,7 @@ export function buildManor(B, scene){
   /* ============ GROUND FLOOR ============ */
 
   // ---- entrance hall x[-3..3] z[0..10] ----
-  B.floor(-3, 0, 3, 10, 0.001, M.flag);
+  B.floor(-3, 0, 3, 10, 0.035, M.flag);
   B.ceiling(-3, 0, 3, 10, H, M.plasterD);
   // hall walls: panelling below (built as low strip) + fern paper above
   const hallWall = (x1,z1,x2,z2,holes) => {
@@ -164,7 +164,7 @@ export function buildManor(B, scene){
   world.stair7 = { minX: 1.55, maxX: 2.95, minZ: 8 - stepD*7, maxZ: 8 - stepD*6 }; // the 7th step
 
   // ---- library x[-12..-3] z[5..10] ----
-  B.floor(-12, 5, -3, 10, 0.001, M.wood);
+  B.floor(-12, 5, -3, 10, 0.035, M.wood);
   B.ceiling(-12, 5, -3, 10, H, M.plasterD);
   B.wall(-12, 10, -3, 10, 0, H, M.panel, [{ at: 4.5, w: 1.6, h: 1.7, bottom: 0.9 }]); // window
   B.wall(-12, 5, -3, 5, 0, H, M.panel);
@@ -190,7 +190,7 @@ export function buildManor(B, scene){
   B.box(M.dark, 0.8, 1.1, 0.8, -6.2, 0.55, 6.6);
 
   // ---- sitting room x[-12..-3] z[0..5] ----
-  B.floor(-12, 0, -3, 5, 0.001, M.wood);
+  B.floor(-12, 0, -3, 5, 0.035, M.wood);
   B.ceiling(-12, 0, -3, 5, H, M.plasterD);
   B.wall(-12, 0, -3, 0, 0, H, M.fern);
   B.wall(-12, 0, -12, 5, 0, H, M.fern, [{ at: 2.5, w: 1.5, h: 1.6, bottom: 0.95 }]);
@@ -217,7 +217,7 @@ export function buildManor(B, scene){
   world.props.medicalText = medText;
 
   // ---- drawing room x[3..12] z[5..10] ----
-  B.floor(3, 5, 12, 10, 0.001, M.wood);
+  B.floor(3, 5, 12, 10, 0.035, M.wood);
   B.ceiling(3, 5, 12, 10, H, M.plasterD);
   B.wall(3, 10, 12, 10, 0, H, M.fern, [{ at: 4.5, w: 1.6, h: 1.7, bottom: 0.9 }]);
   B.wall(3, 5, 12, 5, 0, H, M.fern);
@@ -249,7 +249,7 @@ export function buildManor(B, scene){
   B.box(M.dark, 1.9, 0.6, 0.7, 5.5, 0.3, 5.6);
 
   // ---- dining room x[3..12] z[0..5] ----
-  B.floor(3, 0, 12, 5, 0.001, M.wood);
+  B.floor(3, 0, 12, 5, 0.035, M.wood);
   B.ceiling(3, 0, 12, 5, H, M.plasterD);
   B.wall(3, 0, 12, 0, 0, H, M.fern);
   B.wall(12, 0, 12, 5, 0, H, M.fern);
@@ -274,7 +274,7 @@ export function buildManor(B, scene){
   B.box(M.woodDark, 0.5, 1.0, 2.2, 11.6, 0.5, 4.0);
 
   // ---- back corridor x[-12..3] z[-3..0] ----
-  B.floor(-12, -3, 3, 0, 0.001, M.woodDark);
+  B.floor(-12, -3, 3, 0, 0.035, M.woodDark);
   B.ceiling(-12, -3, 3, 0, H, M.plasterD);
   // south side (z=0): shared with sitting room / hall opening handled above;
   // segment west of hall:
@@ -287,7 +287,7 @@ export function buildManor(B, scene){
   world.doors.westWing = B.door(-12, -1.5, false, M.panel, { locked: true, w: 1.1, h: 2.12, name: 'westWing' });
 
   // ---- kitchen x[-12..-4] z[-9..-3] ----
-  B.floor(-12, -9, -4, -3, 0.001, M.flag);
+  B.floor(-12, -9, -4, -3, 0.035, M.flag);
   B.ceiling(-12, -9, -4, -3, H, M.plaster);
   B.wall(-12, -9, -4, -9, 0, H, M.plaster, [{ at: 4, w: 1.4, h: 1.5, bottom: 1.0 }]);
   B.wall(-12, -9, -12, -3, 0, H, M.plaster);
@@ -326,7 +326,7 @@ export function buildManor(B, scene){
 
   // ---- breakfast room x[-4..3] z[-9..-3] ----
   // NOTE east-facing in spirit; door from corridor
-  B.floor(-4, -9, 3, -3, 0.001, M.wood);
+  B.floor(-4, -9, 3, -3, 0.035, M.wood);
   B.ceiling(-4, -9, 3, -3, H, M.plaster);
   B.wall(-4, -9, 3, -9, 0, H, M.fern, [{ at: 3.5, w: 1.4, h: 1.5, bottom: 1.0 }]);
   B.wall(3, -9, 3, -3, 0, H, M.fern);

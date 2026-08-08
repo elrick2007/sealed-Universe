@@ -422,7 +422,7 @@ export function linen(tone = '#cfc9b8'){
 
 /* ---------- night sky / void ---------- */
 export function makeAll(){
-  return {
+  const T = {
     gravel: gravel(),
     flagstone: flagstone(),
     woodFloor: woodFloor(0),
@@ -447,4 +447,20 @@ export function makeAll(){
     sheetMusic: sheetMusic(),
     linen: linen(),
   };
+  // ART OVERRIDE PIPELINE — drop a PNG named assets/<key>.png (e.g.
+  // assets/roseWallpaper.png, generated in Sorceress from the bible's
+  // Section 10 prompts) and it silently replaces the procedural texture.
+  // Missing files are ignored; the procedural version stays.
+  for (const key of Object.keys(T)){
+    const img = new Image();
+    img.onload = () => {
+      const t = T[key];
+      t.image = img;
+      t.dispose();        // drop the old GPU allocation so the new size uploads cleanly
+      t.needsUpdate = true;
+    };
+    img.onerror = () => {}; // no override — keep the procedural texture
+    img.src = `./assets/${key}.png`;
+  }
+  return T;
 }

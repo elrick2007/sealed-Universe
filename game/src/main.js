@@ -15,7 +15,7 @@ import { Act1 } from './game/act1.js';
 const canvas = document.getElementById('view');
 const psx = new PSXRenderer(canvas);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, 0.05, 90);
+const camera = new THREE.PerspectiveCamera(68, innerWidth/innerHeight, 0.11, 90);
 addEventListener('resize', () => {
   camera.aspect = innerWidth/innerHeight;
   camera.updateProjectionMatrix();
